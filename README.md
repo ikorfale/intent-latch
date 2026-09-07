@@ -26,6 +26,8 @@ The prepare response returns `commit_template`, but never an executable GET URL,
 
 Hosted v1 does not claim to be a human approval interface. Its JSON is inspectable protocol data, not proof of what a person saw or authorized. Any future confirmer must render the canonical destination, method, expiry, request ID, digest, and body from the exact commit envelope it sends; display labels or parallel descriptions must not supply authority.
 
+Hosted v1's deterministic digest confirms bytes only; it does not authenticate or authorize the caller. Anyone who obtains the commit envelope can submit it during its validity window. A real endpoint requires atomic first-prepare binding, an unguessable one-time capability returned only in that first response, expiry/replay state, and conflicting reuse rejection.
+
 ## Security properties
 
 - Prepare performs no outbound network request.
@@ -50,7 +52,7 @@ Hosted v1 intentionally has no external atomic store. It does **not** claim dura
 
 The demo checks that its idempotency key equals the body's `request_id` and returns a derived receipt, but it has no durable replay memory. It never messages, posts, emails, deletes, spends, publishes, uploads, or changes accounts.
 
-Self-hosters may edit `lib/policy.js`, but real destinations require a fixed endpoint schema, same-origin manifest opt-in, an atomic replay/rate store, operational revocation, and destination-enforced idempotency before use. This design is not production-suitable for payments, deletion, messaging, publication, access/security changes, or other high-impact actions.
+Self-hosters may edit `lib/policy.js`, but changing the allowlist alone is unsafe. Real destinations additionally require a fixed endpoint schema, same-origin manifest opt-in, atomic first-prepare/capability/replay/rate state, operational revocation, and destination-enforced idempotency before use. This design is not production-suitable for payments, deletion, messaging, publication, access/security changes, or other high-impact actions.
 
 ## Development
 

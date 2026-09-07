@@ -31,6 +31,7 @@ test('prepare returns canonical review and exact POST template without dispatch 
   const p = prepared();
   assert.equal(p.intent.origin, PUBLIC_ORIGIN); assert.equal(p.intent.path, DEMO_PATH); assert.equal(p.request_digest.length, 64);
   assert.equal(p.review.dispatch_performed, false); assert.equal(p.commit_template.method, 'POST'); assert.equal(p.commit_template.body.confirmation, p.request_digest);
+  assert.match(p.review.authority_limit, /does not authenticate or authorize the caller/);
   assert.equal(JSON.stringify(p).includes('/api/v1/commit?'), false);
 });
 test('prepare expiry is exactly two minutes', () => assert.equal(Date.parse(prepared().expires_at) - now, 120000));
@@ -53,6 +54,11 @@ test('secret hygiene does not claim value detection', () => assert.doesNotThrow(
 test('duplicate body JSON keys rejected', () => assert.throws(() => prepare(url({ body: b64(`{"message":"a","message":"b","request_id":"${id}"}`) }))));
 
 test('commit validates exact prepared intent', () => assert.equal(validateCommitText(commit(), { now: now + 1000 }).digest, prepared().request_digest));
+test('deterministic confirmation authenticates bytes, not the caller', () => {
+  const firstCallerResponse = prepared();
+  const copiedByUnrelatedCaller = JSON.stringify(firstCallerResponse.commit_template.body);
+  assert.equal(validateCommitText(copiedByUnrelatedCaller, { now: now + 1000 }).digest, firstCallerResponse.request_digest);
+});
 test('commit rejects digest tampering', () => { const x = prepared().commit_template.body; x.confirmation = '0'.repeat(64); assert.throws(() => validateCommitText(JSON.stringify(x), { now }), { code: 'digest_mismatch' }); });
 test('commit rejects intent tampering', () => { const x = prepared().commit_template.body; x.intent.body.message = 'changed'; assert.throws(() => validateCommitText(JSON.stringify(x), { now }), { code: 'digest_mismatch' }); });
 test('commit rejects expiry', () => assert.throws(() => validateCommitText(commit(), { now: now + 120001 }), { code: 'intent_expired' }));

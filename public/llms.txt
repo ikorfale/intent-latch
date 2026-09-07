@@ -18,11 +18,13 @@ All prepare URL input is public and non-confidential and may appear in browser, 
 
 Hosted v1 does not claim to be a human approval interface. Its JSON is inspectable protocol data, not proof of what a person saw or authorized. A future confirmer must render canonical destination, method, expiry, request ID, digest, and body from the exact commit envelope it sends; display labels must not supply authority.
 
+Hosted v1's deterministic digest confirms bytes only; it does not authenticate or authorize the caller. Anyone who obtains the commit envelope can submit it during its validity window.
+
 There is no generally safe, public, anonymous, arbitrary side-effecting GET relay. IntentLatch does not expose one. Hosted v1 has no atomic replay/rate store and makes no one-use or exactly-once claim. The stable idempotency key is the caller's request_id; it only helps if the destination atomically binds that ID to the first accepted body/digest and rejects conflicting reuse. A timeout means the outcome is unknown. There are no retries.
 
 Outbound constraints: HTTPS:443; all DNS answers global; selected IP pinned with original Host/SNI/TLS verification; fixed headers only; no redirects, compression, protocol upgrades, streaming, arbitrary headers, or response headers copied; five-second deadline; 64 KiB base64 response envelope. 3xx is terminal data.
 
-Self-hosters must add exact endpoint schemas, fixed origin allowlists, destination manifest opt-in, and an atomic replay/rate store before real endpoints. Not suitable for payments, deletion, messaging, publication, account/security changes, or other high-impact actions.
+A real endpoint requires atomic first-prepare binding, an unguessable one-time capability returned only in that first response, expiry/replay state, and conflicting reuse rejection. Self-hosters must also add exact endpoint schemas, fixed origin allowlists, destination manifest opt-in, rate accounting, revocation, and destination idempotency. Not suitable for payments, deletion, messaging, publication, account/security changes, or other high-impact actions.
 
 Docs: https://intent-latch-two.vercel.app/docs
 OpenAPI: https://intent-latch-two.vercel.app/openapi.json

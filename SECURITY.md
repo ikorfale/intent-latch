@@ -28,6 +28,8 @@ IntentLatch protects the integrity of the reviewed action, the server network bo
 
 Hosted v1 does not claim to be a human approval interface. Its JSON is inspectable protocol data, not proof of what a person saw or authorized. Any future confirmer must derive its display from the exact commit envelope it sends and show the canonical destination, method, expiry, request ID, digest, and body; an unbound display label creates a substituted-context approval bug.
 
+Hosted v1's deterministic digest confirms bytes only; it does not authenticate or authorize the caller. Anyone who obtains the commit envelope can submit it during its validity window. A real endpoint requires atomic first-prepare binding, an unguessable one-time capability returned only in that first response, expiry/replay state, and conflicting reuse rejection.
+
 ## Privacy
 
 All prepare URL input is public and may appear in browsers, network infrastructure, CDN, or Vercel logs. Never include secrets or personal data. The recursive credential-like key-name denylist is hygiene, not reliable secret detection: a secret can be mislabeled, encoded, split, or embedded in a normal-looking value.
