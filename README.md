@@ -65,7 +65,7 @@ All network behavior tests use injected resolvers/transports or local fixtures; 
 
 ## Deployment and rollback
 
-`vercel.json` selects the Node runtime and static security headers. Production is deployed from GitHub through Vercel Hobby with no database, paid service, custom domain, or secret.
+`package.json` selects Node 24 while `vercel.json` sets routes and static security headers. Production is deployed from GitHub through Vercel Hobby with no database, paid service, custom domain, or secret.
 
 Rollback: use Vercel's deployment history to promote the previous verified deployment, or revert the offending Git commit and push `main`. To disable all dispatch immediately in source, remove the hosted entry in `validateHostedTarget`, redeploy, and verify `destination_not_allowed` before restoring traffic.
 

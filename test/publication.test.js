@@ -24,7 +24,8 @@ test('application source has no logging calls', () => {
   for (const dir of ['api','lib']) for (const file of fs.readdirSync(path.join(root, dir), { recursive: true }).filter((x) => x.endsWith('.js'))) assert.doesNotMatch(read(path.join(dir, file)), /\bconsole\.|process\.stdout|process\.stderr|\.log\s*\(/, `${dir}/${file}`);
 });
 test('project has no runtime dependencies', () => { const pkg = JSON.parse(read('package.json')); assert.equal(pkg.dependencies, undefined); assert.equal(pkg.devDependencies, undefined); });
-test('Vercel config selects Node 24', () => assert.equal(JSON.parse(read('vercel.json')).functions['api/v1/*.js'].runtime, 'nodejs24.x'));
+test('package engine selects Node 24 for Vercel functions', () => assert.match(JSON.parse(read('package.json')).engines.node, /24/));
+test('Vercel relies on native Node runtime rather than community runtime config', () => assert.equal(JSON.parse(read('vercel.json')).functions, undefined));
 test('API code contains no CORS response header', () => { for (const dir of ['api','lib']) for (const file of fs.readdirSync(path.join(root, dir), { recursive: true }).filter((x) => x.endsWith('.js'))) assert.doesNotMatch(read(path.join(dir, file)), /access-control-allow-origin/i); });
 test('transport source rejects upgrades and compression', () => { const source = read('lib/transport.js'); assert.match(source, /once\('upgrade'/); assert.match(source, /compressed_response_rejected/); assert.match(source, /maxResponseBytes = 65536/); assert.match(source, /timeoutMs = 5000/); });
 test('API headers include no-store, noindex, attachment, CSP, CORP, referrer and nosniff', () => { const source = read('lib/http.js'); for (const token of ['no-store','noindex','attachment','Content-Security-Policy','Cross-Origin-Resource-Policy','no-referrer','nosniff']) assert.ok(source.includes(token), token); });
