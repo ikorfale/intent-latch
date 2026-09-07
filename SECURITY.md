@@ -26,6 +26,8 @@ IntentLatch protects the integrity of the reviewed action, the server network bo
 - All API success and error responses are no-store, noindex, attachment JSON with restrictive browser headers and no CORS.
 - Source contains no application logging calls.
 
+Hosted v1 does not claim to be a human approval interface. Its JSON is inspectable protocol data, not proof of what a person saw or authorized. Any future confirmer must derive its display from the exact commit envelope it sends and show the canonical destination, method, expiry, request ID, digest, and body; an unbound display label creates a substituted-context approval bug.
+
 ## Privacy
 
 All prepare URL input is public and may appear in browsers, network infrastructure, CDN, or Vercel logs. Never include secrets or personal data. The recursive credential-like key-name denylist is hygiene, not reliable secret detection: a secret can be mislabeled, encoded, split, or embedded in a normal-looking value.

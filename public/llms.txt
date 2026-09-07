@@ -16,6 +16,8 @@ Body schema: exactly {"message":"1–280 characters","request_id":"matching UUID
 
 All prepare URL input is public and non-confidential and may appear in browser, CDN, or Vercel logs. Never include secrets, personal data, credentials, cookies, passwords, tokens, API keys, sessions, JWTs, or signatures. Recursive sensitive-key-name blocking is hygiene, not reliable secret detection. Application code does not log request URLs, bodies, intents, digests, or response payloads.
 
+Hosted v1 does not claim to be a human approval interface. Its JSON is inspectable protocol data, not proof of what a person saw or authorized. A future confirmer must render canonical destination, method, expiry, request ID, digest, and body from the exact commit envelope it sends; display labels must not supply authority.
+
 There is no generally safe, public, anonymous, arbitrary side-effecting GET relay. IntentLatch does not expose one. Hosted v1 has no atomic replay/rate store and makes no one-use or exactly-once claim. The stable idempotency key is the caller's request_id; it only helps if the destination atomically binds that ID to the first accepted body/digest and rejects conflicting reuse. A timeout means the outcome is unknown. There are no retries.
 
 Outbound constraints: HTTPS:443; all DNS answers global; selected IP pinned with original Host/SNI/TLS verification; fixed headers only; no redirects, compression, protocol upgrades, streaming, arbitrary headers, or response headers copied; five-second deadline; 64 KiB base64 response envelope. 3xx is terminal data.

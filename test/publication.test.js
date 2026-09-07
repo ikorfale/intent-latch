@@ -8,10 +8,12 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const docs = ['README.md','SECURITY.md','public/index.html','public/docs.html','public/security.html','public/llms.txt'];
 const impossibility = 'There is no generally safe, public, anonymous, arbitrary side-effecting GET relay.';
 const timeout = 'A timeout means the outcome is unknown';
+const noApprovalClaim = 'Hosted v1 does not claim to be a human approval interface.';
 
 test('all publication surfaces state side-effecting GET impossibility', () => { for (const file of docs) assert.ok(read(file).includes(impossibility), file); });
 test('all publication surfaces state timeout ambiguity', () => { for (const file of docs) assert.ok(read(file).includes(timeout), file); });
 test('all publication surfaces avoid exactly-once claims', () => { for (const file of docs) assert.match(read(file), /no |does not|cannot|makes no|has no/i, file); });
+test('all publication surfaces reject unbound human-approval claims', () => { for (const file of docs) assert.ok(read(file).includes(noApprovalClaim), file); });
 test('landing has no JavaScript', () => assert.doesNotMatch(read('public/index.html'), /<script\b/i));
 test('landing uses no external runtime assets', () => { const html = read('public/index.html'); assert.doesNotMatch(html, /<(?:script|img|link)[^>]+(?:src|href)=["']https?:/i); });
 test('landing builder submits only to prepare GET', () => { const html = read('public/index.html'); assert.match(html, /<form action="\/api\/v1\/prepare" method="get">/); assert.doesNotMatch(html, /<form[^>]+commit/i); });

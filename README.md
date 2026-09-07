@@ -24,6 +24,8 @@ Hosted origin/path are exactly `https://intent-latch-two.vercel.app/api/v1/demo-
 
 The prepare response returns `commit_template`, but never an executable GET URL, redirect, hyperlink, or subresource. The template places the full intent and confirmation digest in a JSON POST body.
 
+Hosted v1 does not claim to be a human approval interface. Its JSON is inspectable protocol data, not proof of what a person saw or authorized. Any future confirmer must render the canonical destination, method, expiry, request ID, digest, and body from the exact commit envelope it sends; display labels or parallel descriptions must not supply authority.
+
 ## Security properties
 
 - Prepare performs no outbound network request.
