@@ -58,7 +58,7 @@ Requires Node 24 and no npm dependencies.
 npm test
 npm run lint
 npm run build
-npm start
+npm run dev
 ```
 
 All network behavior tests use injected resolvers/transports or local fixtures; tests never send arbitrary outbound action requests.

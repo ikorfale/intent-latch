@@ -9,6 +9,6 @@
     "test": "node --test",
     "lint": "node --check lib/*.js api/v1/*.js test/*.js",
     "build": "node scripts-build.js",
-    "start": "node server.js"
+    "dev": "node scripts/dev-server.js"
   }
 }

@@ -1,9 +1,9 @@
 import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import prepare from './api/v1/prepare.js';
-import commit from './api/v1/commit.js';
-import demo from './api/v1/demo-target.js';
+import prepare from '../api/v1/prepare.js';
+import commit from '../api/v1/commit.js';
+import demo from '../api/v1/demo-target.js';
 
 const routes = new Map([['/api/v1/prepare', prepare], ['/api/v1/commit', commit], ['/api/v1/demo-target', demo]]);
 const staticMap = new Map([['/', 'index.html'], ['/docs', 'docs.html'], ['/security', 'security.html'], ['/style.css', 'style.css'], ['/llms.txt', 'llms.txt'], ['/openapi.json', 'openapi.json'], ['/robots.txt', 'robots.txt']]);
