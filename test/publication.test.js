@@ -18,6 +18,14 @@ test('landing has no JavaScript', () => assert.doesNotMatch(read('public/index.h
 test('landing uses no external runtime assets', () => { const html = read('public/index.html'); assert.doesNotMatch(html, /<(?:script|img|link)[^>]+(?:src|href)=["']https?:/i); });
 test('landing builder submits only to prepare GET', () => { const html = read('public/index.html'); assert.match(html, /<form action="\/api\/v1\/prepare" method="get">/); assert.doesNotMatch(html, /<form[^>]+commit/i); });
 test('landing does not render executable commit link', () => assert.doesNotMatch(read('public/index.html'), /href=["'][^"']*\/api\/v1\/commit/i));
+test('published examples cannot be pasted as a commit request', () => {
+  const markdownBlocks = [...read('README.md').matchAll(/```[^\n]*\n([\s\S]*?)```/g)].map((match) => match[1]);
+  const htmlBlocks = ['public/index.html','public/docs.html','public/security.html'].flatMap((file) => [...read(file).matchAll(/<pre[^>]*>([\s\S]*?)<\/pre>/gi)].map((match) => match[1]));
+  for (const block of [...markdownBlocks, ...htmlBlocks]) {
+    assert.doesNotMatch(block, /\/api\/v1\/commit/i);
+    assert.doesNotMatch(block, /\bcurl\b[\s\S]*?(?:-X|--request)\s+(?:POST|PUT|PATCH)\b/i);
+  }
+});
 test('llms and OpenAPI expose no GET commit operation', () => { const spec = JSON.parse(read('public/openapi.json')); assert.deepEqual(Object.keys(spec.paths['/api/v1/commit']), ['post']); assert.doesNotMatch(read('public/llms.txt'), /GET \/api\/v1\/commit/); });
 test('OpenAPI hosted allowlist is exact demo only', () => { const spec = JSON.parse(read('public/openapi.json')); const origin = spec.paths['/api/v1/prepare'].get.parameters.find((p) => p.name === 'origin'); const target = spec.paths['/api/v1/prepare'].get.parameters.find((p) => p.name === 'path'); assert.equal(origin.schema.const, 'https://intent-latch-two.vercel.app'); assert.equal(target.schema.const, '/api/v1/demo-target'); });
 test('OpenAPI allows only POST PUT PATCH action methods', () => { const spec = JSON.parse(read('public/openapi.json')); const method = spec.paths['/api/v1/prepare'].get.parameters.find((p) => p.name === 'method'); assert.deepEqual(method.schema.enum, ['POST','PUT','PATCH']); });
