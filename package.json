@@ -1,0 +1,14 @@
+{
+  "name": "intent-latch",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prepare with GET. Commit with POST.",
+  "type": "module",
+  "engines": { "node": ">=24 <25" },
+  "scripts": {
+    "test": "node --test",
+    "lint": "node --check lib/*.js api/v1/*.js test/*.js",
+    "build": "node scripts-build.js",
+    "start": "node server.js"
+  }
+}

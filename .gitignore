@@ -1,0 +1,9 @@
+node_modules/
+.vercel/
+coverage/
+.DS_Store
+*.log
+.env
+.env.*
+!*.example
+evidence/screenshots/*.png

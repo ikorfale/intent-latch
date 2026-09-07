@@ -1,0 +1,28 @@
+# IntentLatch
+
+> Prepare with GET. Commit with POST.
+
+IntentLatch is a narrow, security-conscious intent protocol adapter. It is not a general open proxy.
+
+## Endpoints
+
+- GET /api/v1/prepare — validates exact query parameters origin,path,method,request_id,body and returns a canonical intent, SHA-256 digest, two-minute expiry, review metadata, and exact POST template. The body parameter is unpadded base64url of strict UTF-8 JSON object data, maximum 4096 decoded bytes. Prepare performs no outbound fetch and never dispatches.
+- POST /api/v1/commit — the only dispatch endpoint. Accepts application/json with exactly intent and confirmation. Revalidates digest, expiry, schema, fixed allowlist, and DNS. No GET commit route exists.
+- POST|PUT|PATCH /api/v1/demo-target — exact same-project harmless target. Direct calls fail. It returns a bounded echo and deterministic receipt; it never messages, posts, emails, deletes, spends, or changes accounts.
+
+Hosted target: https://intent-latch.vercel.app/api/v1/demo-target only.
+Allowed action methods: POST, PUT, PATCH only.
+Body schema: exactly {"message":"1–280 characters","request_id":"matching UUIDv4"}.
+
+All prepare URL input is public and non-confidential and may appear in browser, CDN, or Vercel logs. Never include secrets, personal data, credentials, cookies, passwords, tokens, API keys, sessions, JWTs, or signatures. Recursive sensitive-key-name blocking is hygiene, not reliable secret detection. Application code does not log request URLs, bodies, intents, digests, or response payloads.
+
+There is no generally safe, public, anonymous, arbitrary side-effecting GET relay. IntentLatch does not expose one. Hosted v1 has no atomic replay/rate store and makes no one-use or exactly-once claim. The deterministic idempotency key only helps if the destination enforces it. A timeout means the outcome is unknown. There are no retries.
+
+Outbound constraints: HTTPS:443; all DNS answers global; selected IP pinned with original Host/SNI/TLS verification; fixed headers only; no redirects, compression, protocol upgrades, streaming, arbitrary headers, or response headers copied; five-second deadline; 64 KiB base64 response envelope. 3xx is terminal data.
+
+Self-hosters must add exact endpoint schemas, fixed origin allowlists, destination manifest opt-in, and an atomic replay/rate store before real endpoints. Not suitable for payments, deletion, messaging, publication, account/security changes, or other high-impact actions.
+
+Docs: https://intent-latch.vercel.app/docs
+OpenAPI: https://intent-latch.vercel.app/openapi.json
+Security: https://intent-latch.vercel.app/security
+Source: https://github.com/ikorfale/intent-latch

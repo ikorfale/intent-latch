@@ -1,0 +1,47 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "IntentLatch",
+    "version": "1.0.0",
+    "description": "Prepare with GET. Commit with POST. A narrow harmless-demo protocol, not an open proxy. There is no generally safe, public, anonymous, arbitrary side-effecting GET relay. The deterministic idempotency key only helps if the destination enforces it. A timeout means the outcome is unknown."
+  },
+  "servers": [{"url": "https://intent-latch.vercel.app"}],
+  "paths": {
+    "/api/v1/prepare": {
+      "get": {
+        "summary": "Prepare without dispatch",
+        "description": "All URL input is public and non-confidential. No outbound fetch occurs.",
+        "parameters": [
+          {"name":"origin","in":"query","required":true,"schema":{"type":"string","const":"https://intent-latch.vercel.app"}},
+          {"name":"path","in":"query","required":true,"schema":{"type":"string","const":"/api/v1/demo-target"}},
+          {"name":"method","in":"query","required":true,"schema":{"type":"string","enum":["POST","PUT","PATCH"]}},
+          {"name":"request_id","in":"query","required":true,"schema":{"type":"string","format":"uuid"}},
+          {"name":"body","in":"query","required":true,"description":"Unpadded base64url of strict UTF-8 JSON object, at most 4096 decoded bytes.","schema":{"type":"string"}}
+        ],
+        "responses":{"200":{"description":"Canonical intent and exact POST commit template","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Prepared"}}}},"400":{"$ref":"#/components/responses/Error"},"403":{"$ref":"#/components/responses/Error"}}
+      }
+    },
+    "/api/v1/commit": {
+      "post": {
+        "summary": "Commit one exact intent",
+        "description": "Only dispatch route. No redirects or retries. Response is synthetic JSON with base64 upstream body and no copied upstream headers.",
+        "requestBody":{"required":true,"content":{"application/json":{"schema":{"type":"object","additionalProperties":false,"required":["intent","confirmation"],"properties":{"intent":{"$ref":"#/components/schemas/Intent"},"confirmation":{"type":"string","pattern":"^[a-f0-9]{64}$"}}}}}},
+        "responses":{"200":{"description":"Completed demo response envelope"},"400":{"$ref":"#/components/responses/Error"},"403":{"$ref":"#/components/responses/Error"},"502":{"$ref":"#/components/responses/Error"},"504":{"description":"Outcome unknown; never retry automatically"}}
+      }
+    },
+    "/api/v1/demo-target": {
+      "post":{"summary":"Harmless same-project bounded echo","responses":{"200":{"description":"Deterministic receipt"},"403":{"$ref":"#/components/responses/Error"}}},
+      "put":{"summary":"Harmless same-project bounded echo","responses":{"200":{"description":"Deterministic receipt"}}},
+      "patch":{"summary":"Harmless same-project bounded echo","responses":{"200":{"description":"Deterministic receipt"}}}
+    }
+  },
+  "components": {
+    "schemas": {
+      "DemoBody":{"type":"object","additionalProperties":false,"required":["message","request_id"],"properties":{"message":{"type":"string","minLength":1,"maxLength":280},"request_id":{"type":"string","format":"uuid"}}},
+      "Intent":{"type":"object","additionalProperties":false,"required":["version","origin","path","method","request_id","body","issued_at","expires_at","policy"],"properties":{"version":{"const":1},"origin":{"const":"https://intent-latch.vercel.app"},"path":{"const":"/api/v1/demo-target"},"method":{"enum":["POST","PUT","PATCH"]},"request_id":{"type":"string","format":"uuid"},"body":{"$ref":"#/components/schemas/DemoBody"},"issued_at":{"type":"string","format":"date-time"},"expires_at":{"type":"string","format":"date-time"},"policy":{"const":"hosted-demo-v1"}}},
+      "Prepared":{"type":"object","required":["intent","request_digest","expires_at","review","commit_template"]}
+    },
+    "responses":{"Error":{"description":"Coarse fail-closed JSON error","content":{"application/json":{"schema":{"type":"object","required":["error"],"properties":{"error":{"type":"string"}}}}}}
+  }
+}
+}
