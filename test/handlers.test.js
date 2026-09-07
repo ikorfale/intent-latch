@@ -20,7 +20,7 @@ const assertSafe = (res) => {
 
 test('prepare GET returns safe JSON headers', async () => {
   const id = '550e8400-e29b-41d4-a716-446655440000'; const body = Buffer.from(JSON.stringify({ message: 'hi', request_id: id })).toString('base64url');
-  const url = `/api/v1/prepare?origin=https%3A%2F%2Fintent-latch.vercel.app&path=%2Fapi%2Fv1%2Fdemo-target&method=POST&request_id=${id}&body=${body}`;
+  const url = `/api/v1/prepare?origin=https%3A%2F%2Fintent-latch-two.vercel.app&path=%2Fapi%2Fv1%2Fdemo-target&method=POST&request_id=${id}&body=${body}`;
   const res = await invoke(prepareHandler, request('GET', url)); assert.equal(res.statusCode, 200); assertSafe(res); assert.equal(JSON.parse(res.body).review.dispatch_performed, false);
 });
 for (const method of ['POST','PUT','DELETE','HEAD','OPTIONS']) test(`prepare ${method} does not run and returns 405`, async () => { const res = await invoke(prepareHandler, request(method)); assert.equal(res.statusCode, 405); assertSafe(res); });

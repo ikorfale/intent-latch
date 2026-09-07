@@ -7,3 +7,4 @@ coverage/
 .env.*
 !*.example
 evidence/screenshots/*.png
+.vercel

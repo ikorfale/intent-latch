@@ -10,7 +10,7 @@ IntentLatch is a narrow, security-conscious intent protocol adapter. It is not a
 - POST /api/v1/commit — the only dispatch endpoint. Accepts application/json with exactly intent and confirmation. Revalidates digest, expiry, schema, fixed allowlist, and DNS. No GET commit route exists.
 - POST|PUT|PATCH /api/v1/demo-target — exact same-project harmless target. Direct calls fail. It returns a bounded echo and deterministic receipt; it never messages, posts, emails, deletes, spends, or changes accounts.
 
-Hosted target: https://intent-latch.vercel.app/api/v1/demo-target only.
+Hosted target: https://intent-latch-two.vercel.app/api/v1/demo-target only.
 Allowed action methods: POST, PUT, PATCH only.
 Body schema: exactly {"message":"1–280 characters","request_id":"matching UUIDv4"}.
 
@@ -22,7 +22,7 @@ Outbound constraints: HTTPS:443; all DNS answers global; selected IP pinned with
 
 Self-hosters must add exact endpoint schemas, fixed origin allowlists, destination manifest opt-in, and an atomic replay/rate store before real endpoints. Not suitable for payments, deletion, messaging, publication, account/security changes, or other high-impact actions.
 
-Docs: https://intent-latch.vercel.app/docs
-OpenAPI: https://intent-latch.vercel.app/openapi.json
-Security: https://intent-latch.vercel.app/security
+Docs: https://intent-latch-two.vercel.app/docs
+OpenAPI: https://intent-latch-two.vercel.app/openapi.json
+Security: https://intent-latch-two.vercel.app/security
 Source: https://github.com/ikorfale/intent-latch

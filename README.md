@@ -20,7 +20,7 @@ HTTP defines GET as safe so scanners, previews, crawlers, and prefetchers may re
 {"message":"A harmless message of 1–280 characters","request_id":"matching UUIDv4"}
 ```
 
-Hosted origin/path are exactly `https://intent-latch.vercel.app/api/v1/demo-target`. Methods are POST, PUT, or PATCH. Unknown/duplicate parameters and JSON keys, invalid Unicode, excessive depth, noncanonical paths, queries, credentials, forbidden field names, other destinations, and other methods fail closed.
+Hosted origin/path are exactly `https://intent-latch-two.vercel.app/api/v1/demo-target`. Methods are POST, PUT, or PATCH. Unknown/duplicate parameters and JSON keys, invalid Unicode, excessive depth, noncanonical paths, queries, credentials, forbidden field names, other destinations, and other methods fail closed.
 
 The prepare response returns `commit_template`, but never an executable GET URL, redirect, hyperlink, or subresource. The template places the full intent and confirmation digest in a JSON POST body.
 

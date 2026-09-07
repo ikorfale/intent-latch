@@ -40,7 +40,7 @@ test('prepare rejects unknown parameter', () => assert.throws(() => prepare(`${u
 test('prepare rejects malformed query Unicode escape', () => assert.throws(() => prepare('/api/v1/prepare?origin=%zz'), { code: 'invalid_query' }));
 test('prepare rejects oversized URL', () => assert.throws(() => prepare('/api/v1/prepare?' + 'a'.repeat(9000)), { code: 'uri_too_long' }));
 for (const method of ['GET','HEAD','DELETE','OPTIONS','TRACE','CONNECT','post','CUSTOM']) test(`prepare blocks method ${method}`, () => assert.throws(() => prepare(url({ method })), { code: 'method_not_allowed' }));
-for (const origin of ['https://127.1','https://2130706433','https://0x7f000001','https://[::1]','https://[::ffff:127.0.0.1]','http://intent-latch.vercel.app','https://user@intent-latch.vercel.app','https://intent-latch.vercel.app:444','https://intent-latch.vercel.app/?x=1','https://intent-latch.vercel.app/#x']) test(`prepare rejects origin ${origin}`, () => assert.throws(() => prepare(url({ origin }))));
+for (const origin of ['https://127.1','https://2130706433','https://0x7f000001','https://[::1]','https://[::ffff:127.0.0.1]','http://intent-latch.vercel.app','https://user@intent-latch.vercel.app','https://intent-latch-two.vercel.app:444','https://intent-latch-two.vercel.app/?x=1','https://intent-latch-two.vercel.app/#x']) test(`prepare rejects origin ${origin}`, () => assert.throws(() => prepare(url({ origin }))));
 for (const path of ['/api/v1/demo-target?x=1','//api/v1/demo-target','/api/../demo-target','/api/%2e%2e/demo-target','/api/%2Fdemo','/api\\demo']) test(`prepare rejects path ${path}`, () => assert.throws(() => prepare(url({ path }))));
 test('prepare fails closed for arbitrary destination', () => assert.throws(() => prepare(url({ origin: 'https://example.com' })), { code: 'destination_not_allowed' }));
 test('prepare fails closed for same-origin non-demo path', () => assert.throws(() => prepare(url({ path: '/api/v1/commit' })), { code: 'destination_not_allowed' }));
@@ -63,5 +63,5 @@ test('commit rejects unknown envelope field', () => { const x = prepared().commi
 
 for (const ip of ['127.0.0.1','10.0.0.1','100.64.0.1','169.254.169.254','192.168.1.1','198.51.100.1','::1','fc00::1','fe80::1','::ffff:127.0.0.1','2001:db8::1']) test(`special-use address rejected: ${ip}`, () => assert.equal(isGlobalAddress(ip), false));
 for (const ip of ['8.8.8.8','1.1.1.1','2606:4700:4700::1111']) test(`global address accepted: ${ip}`, () => assert.equal(isGlobalAddress(ip), true));
-test('origin canonicalizes default port and host case', () => assert.equal(normalizeOrigin('https://INTENT-LATCH.VERCEL.APP:443'), PUBLIC_ORIGIN));
+test('origin canonicalizes default port and host case', () => assert.equal(normalizeOrigin('https://INTENT-LATCH-TWO.VERCEL.APP:443'), PUBLIC_ORIGIN));
 test('path normalization rejects encoded slash', () => assert.throws(() => normalizePath('/a%2fb')));

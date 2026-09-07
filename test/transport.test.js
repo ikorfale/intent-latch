@@ -38,8 +38,8 @@ test('dispatch pins vetted IP while preserving hostname, SNI, and TLS verificati
     assert.deepEqual(looked, { address: '8.8.8.8', family: 4 });
     return { status: 200, body: Buffer.from('ok') };
   }});
-  assert.equal(observed.options.hostname, 'intent-latch.vercel.app');
-  assert.equal(observed.options.servername, 'intent-latch.vercel.app');
+  assert.equal(observed.options.hostname, 'intent-latch-two.vercel.app');
+  assert.equal(observed.options.servername, 'intent-latch-two.vercel.app');
   assert.equal(observed.options.rejectUnauthorized, true); assert.equal(observed.options.agent, false); assert.equal(observed.options.port, 443);
   assert.equal(observed.options.path, DEMO_PATH); assert.equal(observed.options.method, 'POST');
   assert.deepEqual(JSON.parse(observed.sentBody), intent.body); assert.equal(result.body, 'b2s=');
