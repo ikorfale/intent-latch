@@ -46,11 +46,21 @@ test('dispatch pins vetted IP while preserving hostname, SNI, and TLS verificati
   assert.equal(observed.options.path, DEMO_PATH); assert.equal(observed.options.method, 'POST');
   assert.deepEqual(JSON.parse(observed.sentBody), intent.body); assert.equal(result.body, 'b2s=');
 });
-test('dispatch emits only fixed headers and deterministic key', async () => {
+test('dispatch emits only fixed headers and stable logical-request key', async () => {
   await dispatch(intent, digest, { resolver: publicResolver, requester: async (options) => {
     assert.deepEqual(Object.keys(options.headers).sort(), ['Accept','Accept-Encoding','Content-Length','Content-Type','Idempotency-Key','User-Agent','X-IntentLatch-Hop','X-IntentLatch-Request-Digest'].sort());
-    assert.equal(options.headers['Idempotency-Key'], digest); assert.equal(options.headers['Accept-Encoding'], 'identity'); return { status: 204, body: Buffer.alloc(0) };
+    assert.equal(options.headers['Idempotency-Key'], p.intent.request_id); assert.equal(options.headers['Accept-Encoding'], 'identity'); return { status: 204, body: Buffer.alloc(0) };
   }});
+});
+test('repeated prepares keep one destination idempotency domain despite different intent digests', async () => {
+  const later = prepare(`/api/v1/prepare?origin=${encodeURIComponent(PUBLIC_ORIGIN)}&path=${encodeURIComponent(DEMO_PATH)}&method=POST&request_id=${id}&body=${body}`, { now: now + 1000 });
+  assert.notEqual(later.request_digest, digest);
+  const observed = [];
+  const requester = async (options) => { observed.push([options.headers['Idempotency-Key'], options.headers['X-IntentLatch-Request-Digest']]); return { status: 204, body: Buffer.alloc(0) }; };
+  await dispatch(intent, digest, { resolver: publicResolver, requester });
+  await dispatch(later.intent, later.request_digest, { resolver: publicResolver, requester });
+  assert.deepEqual(observed.map(([key]) => key), [id, id]);
+  assert.notEqual(observed[0][1], observed[1][1]);
 });
 test('redirect is terminal data and never followed', async () => {
   let calls = 0; const result = await dispatch(intent, digest, { resolver: publicResolver, requester: async () => { calls++; return { status: 302, body: Buffer.from('moved') }; } });

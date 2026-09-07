@@ -29,7 +29,7 @@ The prepare response returns `commit_template`, but never an executable GET URL,
 - Prepare performs no outbound network request.
 - Commit re-canonicalizes and verifies digest, expiry, method, path, schema, fixed allowlist, and DNS.
 - Every A/AAAA answer must be global; one vetted IP is pinned into Node HTTPS while preserving Host, SNI, and certificate verification.
-- Fixed outbound headers only: JSON content/accept, identity encoding, user agent, content length, deterministic idempotency key, digest, and relay hop marker.
+- Fixed outbound headers only: JSON content/accept, identity encoding, user agent, content length, stable logical-request idempotency key, full intent digest, and relay hop marker.
 - No retries, redirects, compression, streaming, protocol upgrades, arbitrary caller headers, action query strings, binary, multipart, or copied upstream headers.
 - Overall action deadline is five seconds; response body maximum is 64 KiB and always base64-encoded in a synthetic JSON envelope. 3xx is terminal data.
 - HEAD, OPTIONS, incoming relay recursion, and declared prefetch never dispatch.
@@ -44,9 +44,9 @@ All prepare URL input is public and non-confidential and may appear in browser h
 
 ## Honest limitations
 
-Hosted v1 intentionally has no external atomic store. It does **not** claim durable one-use, rate accounting, encrypted capsules, or exactly-once delivery. The deterministic idempotency key only helps if the destination enforces it. A timeout means the outcome is unknown. Never automatically retry.
+Hosted v1 intentionally has no external atomic store. It does **not** claim durable one-use, rate accounting, encrypted capsules, or exactly-once delivery. The stable idempotency key is the caller's `request_id`; it only helps if the destination atomically binds that ID to the first accepted body/digest and rejects conflicting reuse. A timeout means the outcome is unknown. Never automatically retry.
 
-The demo checks that its deterministic idempotency key equals the request digest and returns a stable derived receipt, but it has no durable replay memory. It never messages, posts, emails, deletes, spends, publishes, uploads, or changes accounts.
+The demo checks that its idempotency key equals the body's `request_id` and returns a derived receipt, but it has no durable replay memory. It never messages, posts, emails, deletes, spends, publishes, uploads, or changes accounts.
 
 Self-hosters may edit `lib/policy.js`, but real destinations require a fixed endpoint schema, same-origin manifest opt-in, an atomic replay/rate store, operational revocation, and destination-enforced idempotency before use. This design is not production-suitable for payments, deletion, messaging, publication, access/security changes, or other high-impact actions.
 

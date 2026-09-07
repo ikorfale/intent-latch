@@ -3,7 +3,7 @@
   "info": {
     "title": "IntentLatch",
     "version": "1.0.0",
-    "description": "Prepare with GET. Commit with POST. A narrow harmless-demo protocol, not an open proxy. There is no generally safe, public, anonymous, arbitrary side-effecting GET relay. The deterministic idempotency key only helps if the destination enforces it. A timeout means the outcome is unknown."
+    "description": "Prepare with GET. Commit with POST. A narrow harmless-demo protocol, not an open proxy. There is no generally safe, public, anonymous, arbitrary side-effecting GET relay. The stable idempotency key is the caller's request_id; it only helps if the destination atomically binds that ID to the first accepted body/digest and rejects conflicting reuse. A timeout means the outcome is unknown."
   },
   "servers": [{"url": "https://intent-latch-two.vercel.app"}],
   "paths": {

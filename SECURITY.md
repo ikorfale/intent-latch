@@ -34,9 +34,9 @@ All prepare URL input is public and may appear in browsers, network infrastructu
 
 There is no generally safe, public, anonymous, arbitrary side-effecting GET relay. Headers cannot reliably distinguish intentional navigation from a scanner. IntentLatch therefore makes GET inert and requires POST.
 
-No atomic store or secret exists in hosted v1, so the service makes no one-use, encrypted-capsule, durable idempotency, rate-accounting, or exactly-once claim. The deterministic idempotency key only helps if the destination enforces it. A timeout means the outcome is unknown and no retry is attempted.
+No atomic store or secret exists in hosted v1, so the service makes no one-use, encrypted-capsule, durable idempotency, rate-accounting, or exactly-once claim. The stable idempotency key is the caller's `request_id`; it only helps if the destination atomically binds that ID to the first accepted body/digest and rejects conflicting reuse. A timeout means the outcome is unknown and no retry is attempted.
 
-**Strongest remaining failure mode:** if a valid commit POST is submitted more than once and a future destination does not enforce the deterministic idempotency key, it can execute more than once. That is why the public allowlist contains only the harmless no-side-effect demo. Platform-level request replay before/around function execution is also outside process-local control.
+**Strongest remaining failure mode:** if a valid commit POST is submitted more than once and a future destination does not enforce the stable request-ID key, it can execute more than once. A destination that accepts one `request_id` with two different bodies also collapses integrity into replay handling; it must reject the conflict rather than select a winner. That is why the public allowlist contains only the harmless no-side-effect demo. Platform-level request replay before/around function execution is also outside process-local control.
 
 Other residual risks include infrastructure URL retention, newly allocated special-use IP ranges not yet reflected in the source list, DNS resolver compromise, platform termination after request bytes leave but before a reply, and denial-of-service against free hosting limits.
 

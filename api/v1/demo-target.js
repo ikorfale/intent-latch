@@ -10,13 +10,13 @@ export default async function handler(req, res) {
     const digest = String(req.headers?.['x-intentlatch-request-digest'] || '');
     const key = String(req.headers?.['idempotency-key'] || '');
     if (!/^[a-f0-9]{64}$/.test(digest)) return errorJson(res, 400, 'invalid_request_digest');
-    const a = Buffer.from(digest), b = Buffer.from(key);
-    if (a.length !== b.length || !timingSafeEqual(a, b)) return errorJson(res, 400, 'idempotency_mismatch');
     const text = await readStrictBody(req, 4096);
     let body;
     try { body = parseStrictJson(text); } catch { return errorJson(res, 400, 'invalid_json'); }
     const requestId = validateUuidV4(body?.request_id);
     validateBody(body, requestId);
+    const a = Buffer.from(requestId), b = Buffer.from(key);
+    if (a.length !== b.length || !timingSafeEqual(a, b)) return errorJson(res, 400, 'idempotency_mismatch');
     const receipt = createHash('sha256').update(`intent-latch-demo-v1\n${digest}\n${canonicalJson(body)}`).digest('hex');
     sendJson(res, 200, { accepted: true, harmless: true, request_id: requestId, request_digest: digest, receipt, echo: { message: body.message } });
   } catch (error) { errorJson(res, error.status || 400, error.code || error.message || 'invalid_request'); }
