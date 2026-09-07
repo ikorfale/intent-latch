@@ -36,6 +36,8 @@ test('dispatch pins vetted IP while preserving hostname, SNI, and TLS verificati
     observed = { options, sentBody }; let looked;
     options.lookup('ignored', {}, (_e, address, family) => { looked = { address, family }; });
     assert.deepEqual(looked, { address: '8.8.8.8', family: 4 });
+    options.lookup('ignored', { all: true }, (_e, addresses) => { looked = addresses; });
+    assert.deepEqual(looked, [{ address: '8.8.8.8', family: 4 }]);
     return { status: 200, body: Buffer.from('ok') };
   }});
   assert.equal(observed.options.hostname, 'intent-latch-two.vercel.app');
